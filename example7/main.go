@@ -17,12 +17,38 @@ func main() {
 	esp8266 := firmata.NewTCPAdaptor("192.168.1.9:3030")
 	arduino := firmata.NewAdaptor("/dev/ttyUSB0")
 
+	rgbled := gpio.NewRgbLedDriver(arduino, "9", "10", "11")
 	servo := gpio.NewServoDriver(arduino, "4")
+
 	accel := i2c.NewADXL345Driver(esp8266)
 
 	work := func() {
 		gobot.Every(100*time.Millisecond, func() {
-			x, _, _ := accel.XYZ()
+			x, y, z := accel.XYZ()
+			r := (x + 1) * 128
+			g := (y + 1) * 128
+			b := (z + 1) * 128
+
+			if r < 0 {
+				r = 0
+			}
+			if g < 0 {
+				g = 0
+			}
+			if b < 0 {
+				b = 0
+			}
+
+			if r > 255 {
+				r = 255
+			}
+			if g > 255 {
+				g = 255
+			}
+			if b > 255 {
+				b = 255
+			}
+
 			angle := uint8((x + 1) * 90)
 
 			if angle < 0 {
@@ -32,16 +58,17 @@ func main() {
 				angle = 180
 			}
 
-			fmt.Println("X:", x)
+			fmt.Println("X:", x, "Y:", y, "Z:", z)
 			fmt.Println("Servo's angle:", angle)
 			servo.Move(angle)
+			rgbled.SetRGB(byte(b), byte(g), byte(r))
 
 		})
 	}
 
-	servorobot := gobot.NewRobot("servo-bot",
+	rgbledrobot := gobot.NewRobot("RGB-bot",
 		[]gobot.Connection{arduino},
-		[]gobot.Device{servo},
+		[]gobot.Device{rgbled},
 		work,
 	)
 
@@ -51,7 +78,7 @@ func main() {
 		nil,
 	)
 
-	master.AddRobot(servorobot)
+	master.AddRobot(rgbledrobot)
 	master.AddRobot(accelrobot)
 
 	master.Start()

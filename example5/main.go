@@ -16,7 +16,7 @@ func main() {
 	esp8266 := firmata.NewTCPAdaptor("192.168.1.9:3030")
 	arduino := firmata.NewAdaptor("/dev/ttyUSB0")
 
-	rgbled := gpio.NewRgbLedDriver(arduino, "9", "10", "11")
+	servo := gpio.NewServoDriver(arduino, "4")
 	light := i2c.NewBH1750Driver(esp8266)
 
 
@@ -24,16 +24,16 @@ func main() {
 		gobot.Every(1*time.Second, func() {
 			lux, _ := light.Lux()
 			fmt.Println("lux:", lux)
-			if lux > 112 {
-				lux = 112
+			if lux > 180 {
+				lux = 180
 			}
-			rgbled.SetRGB(255, byte(255-2*lux), byte(255-lux/2))
+			servo.Move(uint8(lux))
 		})
 	}
 
-	rgbledrobot := gobot.NewRobot("RGB-bot",
+	servorobot := gobot.NewRobot("servo-bot",
 		[]gobot.Connection{arduino},
-		[]gobot.Device{rgbled},
+		[]gobot.Device{servo},
 		work,
 	)
 
@@ -43,7 +43,7 @@ func main() {
 		nil,
 	)
 
-	master.AddRobot(rgbledrobot)
+	master.AddRobot(servorobot)
 	master.AddRobot(lightrobot)
 
 	master.Start()
