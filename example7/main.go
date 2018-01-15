@@ -68,7 +68,7 @@ func main() {
 
 	rgbledrobot := gobot.NewRobot("RGB-bot",
 		[]gobot.Connection{arduino},
-		[]gobot.Device{rgbled},
+		[]gobot.Device{rgbled, servo},
 		work,
 	)
 

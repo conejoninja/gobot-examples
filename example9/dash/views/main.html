@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="http://localhost:3010/static/css/tinycolorpicker.css" type="text/css" media="screen"/>
+
+    <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <!-- build:js jquery.tinycolorpicker.js -->
+    <script type="text/javascript" src="http://localhost:3010/static/js/tinycolorpicker.js"></script>
+    <!-- /build -->
+    <script type="text/javascript">
+        $(document).ready(function()
+        {
+            var $box = $('#colorPicker');
+            $box.tinycolorpicker();
+
+            $box.bind("change", function(evt, hex, rgb)
+            {
+                var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                var r = 255-parseInt(result[1], 16);
+                var g = 255-parseInt(result[2], 16);
+                var b = 255-parseInt(result[3], 16);
+
+                $.ajax({
+                    url: "http://localhost:3010/setrgb/"+r+"/"+g+"/"+b,
+                });
+
+            });
+        });
+    </script>
+</head>
+<body>
+<div id="colorPicker">
+    <a class="color"><div class="colorInner"></div></a>
+    <div class="track"></div>
+    <ul class="dropdown"><li></li></ul>
+    <input type="hidden" class="colorInput"/>
+</div>
+</body>
+</html>
