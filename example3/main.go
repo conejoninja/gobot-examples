@@ -10,17 +10,22 @@ import (
 
 func main() {
 	firmataAdaptor := firmata.NewTCPAdaptor("192.168.1.9:3030")
-	led := gpio.NewLedDriver(firmataAdaptor, "5")
+	led1 := gpio.NewLedDriver(firmataAdaptor, "15")
+	led2 := gpio.NewLedDriver(firmataAdaptor, "13")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
-			led.Toggle()
+			led1.Toggle()
+		})
+
+		gobot.Every(3*time.Second, func() {
+			led2.Toggle()
 		})
 	}
 
 	robot := gobot.NewRobot("bot",
 		[]gobot.Connection{firmataAdaptor},
-		[]gobot.Device{led},
+		[]gobot.Device{led1, led2},
 		work,
 	)
 

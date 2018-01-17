@@ -14,7 +14,7 @@ func main() {
 	arduino := firmata.NewAdaptor("/dev/ttyUSB0")
 
 	led := gpio.NewLedDriver(arduino, "13")
-	button := gpio.NewButtonDriver(esp8266, "4")
+	button := gpio.NewButtonDriver(esp8266, "2")
 
 	work := func() {
 		button.On(gpio.ButtonPush, func(data interface{}) {

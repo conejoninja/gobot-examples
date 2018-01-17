@@ -17,6 +17,7 @@ func main() {
 	servo := gpio.NewServoDriver(arduino, "4")
 
 
+	// my custom dashboard
 	dash.Start(rgbled)
 
 
