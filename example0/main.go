@@ -10,22 +10,21 @@ import (
 
 func main() {
 	firmataAdaptor := firmata.NewAdaptor("/dev/ttyUSB0")
-	led1 := gpio.NewLedDriver(firmataAdaptor, "13")
-	led2 := gpio.NewLedDriver(firmataAdaptor, "12")
+	pin := gpio.NewDirectPinDriver(firmataAdaptor, "13")
 
 	work := func() {
 		gobot.Every(1*time.Second, func() {
-			led1.Toggle()
+			pin.On()
+			time.Sleep(1 * time.Second)
+			pin.Off()
+			time.Sleep(1 * time.Second)
 		})
 
-		gobot.Every(300*time.Millisecond, func() {
-			led2.Toggle()
-		})
 	}
 
-	robot := gobot.NewRobot("led-bot",
+	robot := gobot.NewRobot("pin-bot",
 		[]gobot.Connection{firmataAdaptor},
-		[]gobot.Device{led1, led2},
+		[]gobot.Device{pin},
 		work,
 	)
 
